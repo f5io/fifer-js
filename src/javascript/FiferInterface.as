@@ -5,8 +5,8 @@ package javascript
 	public class FiferInterface
 	{
 		public static const CB_REGISTER_AUDIO 	: String = "registerAudio";
-		public static const CB_PLAY 			: String = "play";
-		public static const CB_STOP 			: String = "stop";
+		public static const CB_PLAY 			: String = "playAudio";
+		public static const CB_STOP 			: String = "stopAudio";
 		public static const CB_STOP_ALL			: String = "stopAll";
 		public static const CB_MUTE 			: String = "mute";
 		public static const CB_UNMUTE 			: String = "unmute";

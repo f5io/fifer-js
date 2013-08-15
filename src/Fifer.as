@@ -28,14 +28,14 @@ package
 			FiferInterface.call(FiferInterface.RS_INITIALISED);
 		}
 		
-		private function onRegisterAudio($name : String, $src : String) : void {
-			FiferManager.sharedManager.registerAudio($name, $src, function($n : String) : void {
+		private function onRegisterAudio($name : String, $src : String, $multiple : Boolean = false) : void {
+			FiferManager.sharedManager.registerAudio($name, $src, $multiple, function($n : String) : void {
 				FiferInterface.call(FiferInterface.RS_LOADED, $n);
 			});
 		}
 		
-		private function onPlay($name : String, $loop : Boolean = false) : void {
-			FiferManager.sharedManager.play($name, $loop);
+		private function onPlay($name : String, $loop : Boolean = false) : String {
+			return FiferManager.sharedManager.play($name, $loop);
 		}
 		
 		private function onStop($name : String) : void {

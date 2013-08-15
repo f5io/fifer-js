@@ -30,7 +30,7 @@ package manager
 			return _instance;
 		}
 		
-		public function registerAudio($name : String, $src : String, $callback : Function) : FiferManager
+		public function registerAudio($name : String, $src : String, $multiple : Boolean, $callback : Function) : FiferManager
 		{
 			var _name : String = $name;
 			var _sound : Sound = new Sound();
@@ -38,7 +38,7 @@ package manager
 			_sound.load(new URLRequest($src));
 			_sound.addEventListener(Event.COMPLETE, registerComplete);
 			
-			_files[_name] = { s : _sound, st : new SoundTransform() };
+			_files[_name] = { s : _sound, st : new SoundTransform(), multiple : $multiple, playing : [] };
 			
 			function registerComplete(e : Event) : void {
 				$callback(_name);
@@ -47,23 +47,29 @@ package manager
 			return _instance;
 		}
 		
-		public function play($name : String, $loop : Boolean = false) : FiferManager
+		public function play($name : String, $loop : Boolean = false) : String
 		{
 			var s : Sound = _files[$name].s;
-			_playing[$name] = s.play(0, ($loop) ? int.MAX_VALUE : 0, _files[$name].st);
-			_playing[$name].addEventListener(Event.SOUND_COMPLETE, function(e : Event) : void {
+			var id : String = $name + Math.random() * new Date().valueOf();
+			_files[$name].playing.push(id);
+			_playing[id] = s.play(0, ($loop) ? int.MAX_VALUE : 0, _files[$name].st);
+			_playing[id].addEventListener(Event.SOUND_COMPLETE, function(e : Event) : void {
 				e.currentTarget.removeEventListener(Event.SOUND_COMPLETE, arguments.callee);
+				_files[$name].playing.shift();
 				FiferInterface.call(FiferInterface.RS_COMPLETED, $name);
 				stop($name);
 			});
-			return _instance;
+			return _files[$name].playing;
 		}
 		
 		public function stop($name : String) : FiferManager
 		{
-			var sc : SoundChannel = _playing[$name];
-			sc.stop();
-			delete _playing[$name];
+			while (_files[$name].playing.length) {
+				var p : String = _files[$name].playing.shift();
+				var sc : SoundChannel = _playing[p];
+				sc.stop();
+				delete _playing[p];		
+			}
 			return _instance;
 		}
 		
@@ -79,13 +85,14 @@ package manager
 		
 		public function mute($name : String) : FiferManager
 		{
-			if (_playing.hasOwnProperty($name)) {
-				var sc : SoundChannel = _playing[$name];
-				sc.soundTransform = new SoundTransform(0);
-			}
 			if (_files.hasOwnProperty($name)) {
 				var st : SoundTransform = _files[$name].st;
 				st.volume = 0;
+				for (var i : int = 0, j : int = _files[$name].playing.length; i < j; i++) {
+					var p : String = _files[$name].playing[i];
+					var sc : SoundChannel = _playing[p];
+					sc.soundTransform = new SoundTransform(0);
+				}
 			}
 			return _instance;
 		}
@@ -108,13 +115,14 @@ package manager
 		
 		public function unmute($name : String) : FiferManager
 		{
-			if (_playing.hasOwnProperty($name)) {
-				var sc : SoundChannel = _playing[$name];
-				sc.soundTransform = new SoundTransform(1);
-			}
 			if (_files.hasOwnProperty($name)) {
 				var st : SoundTransform = _files[$name].st;
 				st.volume = 1;
+				for (var i : int = 0, j : int = _files[$name].playing.length; i < j; i++) {
+					var p : String = _files[$name].playing[i];
+					var sc : SoundChannel = _playing[p];
+					sc.soundTransform = new SoundTransform(1);
+				}
 			}
 			return _instance;
 		}
