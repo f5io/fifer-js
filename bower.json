@@ -1,0 +1,13 @@
+{
+  "name": "fifer",
+  "version": "1.0.0",
+  "main": [
+    "lib/fifer.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "dependencies": {}
+}
