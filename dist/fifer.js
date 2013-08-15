@@ -197,7 +197,6 @@
 	};
 
 	fF.play = function($name) {
-		console.log($name);
 		if (_files[$name].playing.length && !_files[$name].multiple) {
 			console.warn('[Fifer] Audio: ' + $name + ' is already playing.');
 			return fF;
