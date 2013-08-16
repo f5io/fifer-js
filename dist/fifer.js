@@ -113,18 +113,25 @@
 
 	_internals = {
 		registerAudio : function($name, $src) {
+			var ff = false;
 			var a = new Audio();
 			a.addEventListener('canplaythrough', function() {
 				_internals.loaded($name);
 			});
-			a.preload = 'metadata';
+			a.preload = 'auto';
 			if (a.canPlayType('audio/mpeg') === '') {
 				_.warn('[Fifer] Looks like you\'re trying this in Firefox, trying to find an .ogg file.');
 				$src = $src.split('.mp3').join('.ogg');
 				_files[$name].src = $src;
+				ff = true;
 			}
 			a.src = $src;
-			a.load();
+			if (!ff) {
+				a.play();
+				setTimeout(function() { a.pause(); }, 1);
+			} else {
+				a.load();
+			}
 		},
 		playAudio : function($name, $loop) {
 			var id = $name + Math.random() * new Date().getTime();
@@ -210,14 +217,14 @@
 		},
 		loaded : function($name) {
 			_files[$name].loaded = true;
-			for (var f in _files) {
-				if (!_files[f].loaded) return;
-			}
 			var fn = {};
 			fF[$name] = fF[$name] || function($loop) {
 				fF.play($name, $loop);
 				return fF;
 			};
+			for (var f in _files) {
+				if (!_files[f].loaded) return;
+			}
 			_loaded.call(fF, _files);
 		},
 		ended : function($id,$name) {
@@ -256,6 +263,7 @@
 	};
 
 	fF.play = function($name, $loop) {
+		if (typeof $name === 'undefined') return;
 		if (_files[$name].playing.length && !_files[$name].multiple) {
 			_.warn('[Fifer] Audio: ' + $name + ' is already playing.');
 			return fF;
