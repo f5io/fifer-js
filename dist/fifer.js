@@ -1,5 +1,7 @@
 (function(w,d) {
 
+	'use strict';
+
 	var _ = {},
 		_files = {},
 		_playing = {},
@@ -19,11 +21,11 @@
 
 	_.warn = (function() {
 		if ('console' in w && 'warn' in w.console) {
-			return function() {
+			return function wrn() {
 				console.warn(Array.prototype.slice.call(arguments)[0]);
 			};
 		} else {
-			return function() {};
+			return function wrn() {};
 		}
 	})();
 
@@ -41,6 +43,10 @@
 				}, false);
 			};
 		}
+	})();
+
+	_.mozillaFirefox = (function() {
+		return _.support && new Audio().canPlayType('audio/mpeg') === '';
 	})();
 
 	_.extend = function(o,e)
@@ -113,25 +119,21 @@
 
 	_internals = {
 		registerAudio : function($name, $src) {
-			var ff = false;
 			var a = new Audio();
-			a.addEventListener('canplaythrough', function() {
+			a.addEventListener('canplaythrough', function comp() {
+				a.removeEventListener('canplaythrough', comp);
 				_internals.loaded($name);
 			});
-			a.preload = 'auto';
-			if (a.canPlayType('audio/mpeg') === '') {
+			if (_.mozillaFirefox) {
 				_.warn('[Fifer] Looks like you\'re trying this in Firefox, trying to find an .ogg file.');
 				$src = $src.split('.mp3').join('.ogg');
 				_files[$name].src = $src;
-				ff = true;
 			}
 			a.src = $src;
-			if (!ff) {
-				a.play();
-				setTimeout(function() { a.pause(); }, 1);
-			} else {
-				a.load();
-			}
+			a.volume = 0;
+			a.play();
+			d.body.appendChild(a);
+			setTimeout(function() { a.pause(); }, 10);
 		},
 		playAudio : function($name, $loop) {
 			var id = $name + Math.random() * new Date().getTime();
@@ -140,11 +142,11 @@
 			if (typeof $loop !== 'undefined') {
 				_.loop(a);
 			} else {
-				a.addEventListener('ended', function() {
+				a.addEventListener('ended', function end() {
+					a.removeEventListener('ended', end);
 					_internals.ended(id, $name);
 				});
 			}
-			a.load();
 			_files[$name].playing = _files[$name].playing || [];
 			_files[$name].playing.push(id);
 			if (_files[$name].muted) {
@@ -217,11 +219,12 @@
 		},
 		loaded : function($name) {
 			_files[$name].loaded = true;
-			var fn = {};
-			fF[$name] = fF[$name] || function($loop) {
-				fF.play($name, $loop);
-				return fF;
-			};
+			if (fF[$name]() === 'ff-reserved') {
+				fF[$name] = function($loop) {
+					fF.play($name, $loop);
+					return fF;
+				};
+			}
 			for (var f in _files) {
 				if (!_files[f].loaded) return;
 			}
@@ -258,6 +261,7 @@
 			return fF;
 		}
 		_files[$name] = { src : $src, loaded : false, multiple : ($multiple || false), playing : [] };
+		fF[$name] = fF[$name] || function() { return 'ff-reserved'; };
 		_scope.registerAudio($name, $src);
 		return fF;
 	};
