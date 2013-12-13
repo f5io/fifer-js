@@ -94,9 +94,9 @@ Calling `registerAudio` later in your application where the `loaded` `Function` 
 	    })
 	    .registerAudio('bang', 'bang.mp3', true);
 	    
-####`play`(`name /* String */`[,`loop /* boolean : false */`])
+####`play`(`name /* String */`[,`loop /* boolean : false */`, `ended /* Function */`])
 
-The `play` method will play the audio file determined by it's name in the file stack. Providing a `loop` argument will allow you to set the file to loop indefinitely.
+The `play` method will play the audio file determined by it's name in the file stack. Providing a `loop` argument will allow you to set the file to loop indefinitely. The `ended` Function is an optional callback for when the audio file has finished playing.
 
 #####Example
 
@@ -172,11 +172,11 @@ The `unmuteAll` method will unmute all audio in the stack.
 
     Fifer.unmuteAll(); // will unmute all audio in the file stack
     
-####`!dynamic!`([`loop /* boolean : false */`])
+####`!dynamic!`([`loop /* boolean : false */`, `ended /* Function */`])
 
 Once a file has been registered with `Fifer` and it has preloaded, `Fifer` will be extended with a `Function` named after that file.
 
-Calling this dynamic `Function` will play the file. It will also take a `loop` parameter to allow indefinite looping of the file.
+Calling this dynamic `Function` will play the file. It will also take a `loop` parameter to allow indefinite looping of the file and an `ended` callback for when the audio file has finished playing.
 
 #####Example
 

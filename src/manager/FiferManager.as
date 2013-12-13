@@ -47,7 +47,7 @@ package manager
 			return _instance;
 		}
 		
-		public function play($name : String, $loop : Boolean = false) : String
+		public function play($name : String, $loop : Boolean = false) : Object
 		{
 			var s : Sound = _files[$name].s;
 			var id : String = $name + Math.random() * new Date().valueOf();
@@ -56,10 +56,10 @@ package manager
 			_playing[id].addEventListener(Event.SOUND_COMPLETE, function(e : Event) : void {
 				e.currentTarget.removeEventListener(Event.SOUND_COMPLETE, arguments.callee);
 				_files[$name].playing.shift();
-				FiferInterface.call(FiferInterface.RS_COMPLETED, $name);
+				FiferInterface.call(FiferInterface.RS_COMPLETED, [id, $name]);
 				stop($name);
 			});
-			return _files[$name].playing;
+			return { playing : _files[$name].playing, id : id };
 		}
 		
 		public function stop($name : String) : FiferManager

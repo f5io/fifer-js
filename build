@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cp -rf lib/fifer.js dist/fifer.js
+uglifyjs dist/fifer.js -o dist/fifer.min.js --comments '@cc_on!@'
+gzip -c dist/fifer.min.js | wc -c
+
+echo '[Fifer] Build complete.'

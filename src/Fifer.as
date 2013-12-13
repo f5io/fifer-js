@@ -34,7 +34,7 @@ package
 			});
 		}
 		
-		private function onPlay($name : String, $loop : Boolean = false) : String {
+		private function onPlay($name : String, $loop : Boolean = false, $ended : * = null) : Object {
 			return FiferManager.sharedManager.play($name, $loop);
 		}
 		
