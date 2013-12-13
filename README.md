@@ -171,6 +171,16 @@ The `unmuteAll` method will unmute all audio in the stack.
 #####Example
 
     Fifer.unmuteAll(); // will unmute all audio in the file stack
+
+####`isPlaying`([`name /* String */`])
+
+If a `name` argument is provided, it will check to see if a specific file is playing and return a boolean.
+
+If no `name` argument is provided, it will return a boolean showing if `Fifer` is currently playing *any* audio file.
+
+#####Example
+
+   Fifer.isPlaying('bang'); // will return true if the audio file registered as bang is playing
     
 ####`!dynamic!`([`loop /* boolean : false */`, `ended /* Function */`])
 
