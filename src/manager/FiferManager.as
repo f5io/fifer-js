@@ -1,19 +1,22 @@
 package manager
 {
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
+	import flash.media.SoundMixer;
 	import flash.media.SoundTransform;
 	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
 	
 	import javascript.FiferInterface;
 	
-	public class FiferManager
+	public class FiferManager extends Sprite
 	{
 		private static var _instance : FiferManager;
-		private var _files : Object = {};
-		private var _playing : Object = {};
-		private var _muted : Boolean = false;
+		private static var _files : Object = {};
+		private static var _playing : Object = {};
+		private static var _muted : Boolean = false;
 		
 		public function FiferManager(se : SingletonEnforcer)
 		{
@@ -26,8 +29,24 @@ package manager
 		public static function get sharedManager() : FiferManager {
 			if (_instance == null) {
 				_instance = new FiferManager(new SingletonEnforcer());
+				_instance.addEventListener(Event.ENTER_FRAME, enterFrameHandler);
 			}
 			return _instance;
+		}
+		
+		private static function enterFrameHandler(e : Event) : void
+		{
+			var count : int = 0;
+			for (var o : * in _playing) count++;
+			if (count > 0) {
+				var array : Array = new Array();
+				var bytes : ByteArray = new ByteArray();
+				SoundMixer.computeSpectrum(bytes, true, 0);
+				for (var i : int = 0; i < 512; i++) {
+					array.push(bytes.readUnsignedByte());
+				}
+				FiferInterface.call(FiferInterface.RS_SPECTRUM, array);
+			}
 		}
 		
 		public function registerAudio($name : String, $src : String, $multiple : Boolean, $callback : Function) : FiferManager
@@ -55,7 +74,7 @@ package manager
 			_playing[id] = s.play(0, ($loop) ? int.MAX_VALUE : 0, _files[$name].st);
 			_playing[id].addEventListener(Event.SOUND_COMPLETE, function(e : Event) : void {
 				e.currentTarget.removeEventListener(Event.SOUND_COMPLETE, arguments.callee);
-				_files[$name].playing.shift();
+				//_files[$name].playing.shift();
 				FiferInterface.call(FiferInterface.RS_COMPLETED, [id, $name]);
 				stop($name);
 			});

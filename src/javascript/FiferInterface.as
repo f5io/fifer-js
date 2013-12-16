@@ -17,6 +17,7 @@ package javascript
 		public static const RS_LOADED			: String = "responseLoaded";
 		public static const RS_INITIALISED		: String = "responseInitialised";
 		public static const RS_COMPLETED		: String = "responseCompleted";
+		public static const RS_SPECTRUM			: String = "responseSpectrum";
 		
 		public static function on(method : String, callback : Function) : void {
 			ExternalInterface.addCallback(method, callback);

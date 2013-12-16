@@ -181,6 +181,18 @@ If no `name` argument is provided, it will return a boolean showing if `Fifer` i
 #####Example
 
    Fifer.isPlaying('bang'); // will return true if the audio file registered as bang is playing
+
+####`onAudioProcess`([`fn /* Function */`])
+
+The `fn` argument will be called when audio is processed, either using `AudioContext` or Flash's native `computeSpectrum`. An array of values will be passed to Function containing Byte Frequency data from the audio stream.
+
+*Due to a [bug](http://stackoverflow.com/questions/13958158/why-arent-safari-or-firefox-able-to-process-audio-data-from-mediaelementsource) in Safari's handling of analyzing a MediaElementSource, Safari currently reports the array passed to the Function as empty (0) values*
+
+#####Example
+
+   Fifer.onAudioProcess(function(arr) {
+       console.log(arr);
+   });
     
 ####`!dynamic!`([`loop /* boolean : false */`, `ended /* Function */`])
 
